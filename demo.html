@@ -1,0 +1,54 @@
+<html>
+	<head>
+		<title>iWin JS Library Demo</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style type="text/css">
+			.winb{overflow:hidden;position:fixed;border:1px solid #000;border-radius:2px;background:#FFF;}
+			.winbt{display:block;border:solid #000;border-width:0px 0px 1px 0px;font-size:15px;cursor:move}
+			.winbt>img{margin:0px 1px -2px 1px;cursor:pointer}
+			.winbb{display:block;border:solid #000;border-width:0px 0px 1px 0px;font-size:15px;}
+			.winbbt{display:inline-block;padding:1px 2px;border:solid #000;border-width: 0px 1px 0px 0px;cursor:pointer}
+			.winbc{display:block;white-space:nowrap;padding:5px}
+			/* .nse is set to body on drag and resize */
+			.nse{-moz-user-select:-moz-none;-moz-user-select:none;-o-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none}
+		</style>
+		<script type="text/javascript" src="iWin.js"></script>
+		<script type="text/javascript">
+			function createDemoWindow()
+			{
+					var wID = 'iDemo' + new Date().getTime(); // each window must have unique id
+
+					/*
+						Call iWin.create which will create the window.
+						The first argumnent is an object containing parameters.
+						They can be changed later by calling various methods.
+						Second Argument is window id (wId). It should be unique.
+					*/
+					iWin.create({title: 'Window Title', onclose:function(){iWin.destroy(wID)}}, wID);
+
+					/*
+						Set contents of the window.
+						Second argument indicates that we want window to be automatically resized to fit the content
+					*/
+					iWin.setContent('Lorem ipsum dolor sit amet, consectetur adipiscing elit.<br>'+
+						'Nulla varius justo tellus, ac aliquam lorem maximus ut. Suspendisse fermentum<br>'+
+						'purus euismod quam consequat interdum. Maecenas eget ultrices ligula, sed fringilla<br>'+
+						'nisl. Ut eu leo non sem ultricies interdum. Nam et porta metus, sed efficitur felis.<br>'+
+						'Proin et mauris magna. Fusce et condimentum dui, id finibus lorem. Nunc volutpat, neque<br>'+
+						'nec tincidunt auctor, risus dui congue felis, vel tristique ipsum sapien sed lorem.<br>'+
+						'Maecenas tempor vestibulum nunc vel maximus. Nulla varius finibus velit, in aliquet<br>'+
+						'felis dignissim in. Pellentesque ut commodo metus. Sed suscipit erat non mauris finibus<br>'+
+						'pretium. Phasellus dignissim sem turpis, id suscipit magna suscipit ut. ', true, wID);
+					iWin.setPosition(60, (window.innerWidth / 2) - 20, wID);
+
+					// Show the Window
+					iWin.show(wID);
+
+					return true;
+			}
+		</script>
+	</head>
+	<body>
+		<button onclick="createDemoWindow()">Create New window</button>
+	</body>
+</html>
