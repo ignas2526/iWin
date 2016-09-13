@@ -19,15 +19,15 @@ var iWin = {};
 iWin.init = function()
 {
   iWin.win = {};
-  iWin.dragwID;
+  iWin.dragwID = null;
   iWin.dragObj = -1;
-  iWin.dragSTop;
-  iWin.dragSleft;
-  iWin.dragMouseX;
-  iWin.dragMouseY;
+  iWin.dragSTop = null;
+  iWin.dragSleft = null;
+  iWin.dragMouseX = null;
+  iWin.dragMouseY = null;
 
-  iWin.resizeWidth;
-  iWin.resizeHeight;
+  iWin.resizeWidth = null;
+  iWin.resizeHeight = null;
 
   iWin.zwin = [];
   iWin.zindex = 99;
