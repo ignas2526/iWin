@@ -217,13 +217,22 @@ iWin.showTab = function(tID, wID)
 
 iWin.setTabs = function(tabs, wID)
 {
-	var html = '', first = '';
+	var first = '';
+	iWin.win[wID].obj.children[1].innerHTML = '';
 	for (var id in tabs) {
+		if (typeof(id) == 'undefined') continue;
+		
 		if (!first.length) {first = id;}
-		html += '<div class="winbbt" onclick="iWin.showTab(\'' + id + '\',\'' + wID + '\')">' + tabs[id] + '</div>';
+		
+		var obj = document.createElement('div');
+		obj.className = 'winbbt';
+		(function(id, wID){obj.onclick = function(){iWin.showTab(id, wID);};})(id, wID);
+		obj.innerHTML = tabs[id];
+		
+		iWin.win[wID].obj.children[1].appendChild(obj);
 	}
-	if (html != '') {
-		iWin.win[wID].obj.children[1].innerHTML = html;
+	
+	if (first.length) {
 		iWin.win[wID].obj.children[1].style.display = 'block';
 		iWin.showTab(first, wID);
 	} else {
