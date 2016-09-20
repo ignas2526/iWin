@@ -284,7 +284,6 @@ iWin.drag = function(wID, e)
 	document.body.className = 'nse';	
 	document.addEventListener('mousemove', iWin.dragM);
 	document.addEventListener('mouseup', iWin.MoveStop);
-	document.addEventListener('mouseout', iWin.MoveStop2);
 	return true;
 }
 
@@ -301,7 +300,6 @@ iWin.resize = function(wID, e)
 	document.body.className = 'nse';
 	document.addEventListener('mousemove', iWin.resizeM);
 	document.addEventListener('mouseup', iWin.MoveStop);
-	document.addEventListener('mouseout', iWin.MoveStop2);
 	return true;
 }
 
@@ -331,19 +329,12 @@ iWin.dragM = function(e)
 	iWin.dragObj.style.top = by + 'px'; iWin.dragObj.style.left = bx + 'px';
 }
 
-iWin.MoveStop2 = function(e)
-{
-	if ((e.pageY >= 0 && e.pageY <= window.innerHeight) && (e.pageX >= 0 && e.pageX <= window.innerWidth)) return;
-	iWin.MoveStop();
-}
-
 iWin.MoveStop = function()
 {
 	document.body.className = '';
 	document.removeEventListener('mousemove', iWin.resizeM);
 	document.removeEventListener('mousemove', iWin.dragM);
 	document.removeEventListener('mouseup', iWin.MoveStop);
-	document.removeEventListener('mouseout', iWin.MoveStop2);
 	iWin.dragObj = -1;
 
 	if (document.selection && document.selection.empty) {document.selection.empty();}else if (window.getSelection) {window.getSelection().removeAllRanges();}
