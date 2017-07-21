@@ -35,6 +35,7 @@ iWin.init = function()
 	iWin.scroll_length = 0;
 	iWin.contentMaxAutoWidth = 810;
 	iWin.contentMaxAutoHeight = 610;
+	iWin.onSetTitle = typeof param.onSetTitle != 'function' ? function(wID, obj, title) {obj.innerText = title;} : param.onSetTitle;
 
 
 	var tmpDiv = document.createElement('div');
@@ -53,7 +54,7 @@ iWin.create = function(param, wID)
 	iWin.win[wID].obj = document.createElement('div');
 	iWin.win[wID].obj.className = "winb";
 	iWin.win[wID].obj.style.cssText = "display:none;top:50px;left:20px;";
-	iWin.win[wID].obj.innerHTML = '<div class="winbt"><span>[X]</span> <span> </span></div><div class="winbb" style="display:none"></div><div class="winbc"></div>' +
+	iWin.win[wID].obj.innerHTML = '<div class="winbt" style="white-space:nowrap;overflow:hidden;"> </div><div class="winbb" style="display:none"></div><div class="winbc"></div>' +
 	'<div style="cursor:nwse-resize;width:20px;height:20px;position:absolute;right:-7px;bottom:-7px;"> </div>';
 	//'<div style="display:none;position:absolute;width:100%;height:100%;top:0;"></div>';// for modal window lock
 	/*"<img src=\"/img/refresh.png\" onclick=\"bref('"+id+"')\" /> "+*/
@@ -121,7 +122,7 @@ iWin.setTitle = function(title, wID)
 	} else { 
 		iWin.win[wID].titlebar = true;
 		iWin.win[wID].obj.children[0].style.display = 'block';
-		iWin.win[wID].obj.children[0].children[1].innerHTML = title;
+		iWin.onSetTitle(wID, iWin.win[wID].obj.children[0], title);
 	}
 	return true;
 }
