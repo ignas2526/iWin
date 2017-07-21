@@ -16,7 +16,7 @@
 
 var iWin = {};
 
-iWin.init = function()
+iWin.init = function(param)
 {
 	iWin.win = {};
 	iWin.dragwID = null;
