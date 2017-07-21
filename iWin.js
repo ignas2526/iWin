@@ -375,7 +375,3 @@ iWin.messageBox = function(msg, params, _wID) // _wID will be used in future for
 	setTimeout(function(){iWin.destroy(wID)}, parseInt(params.timeout, 10));
 	return true;
 }
-
-window.addEventListener('load', function(e) {
-	iWin.init();
-});
