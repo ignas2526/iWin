@@ -50,11 +50,13 @@ iWin.create = function(param, wID)
 	if (typeof iWin.win[wID] != 'undefined') return false;
 	
 	iWin.win[wID] = {};
+	iWin.win[wID].tabs = {};
 	iWin.win[wID].wID = wID;
 	iWin.win[wID].obj = document.createElement('div');
 	iWin.win[wID].obj.className = "winb";
 	iWin.win[wID].obj.style.cssText = "display:none;top:50px;left:20px;";
-	iWin.win[wID].obj.innerHTML = '<div class="winbt" style="white-space:nowrap;overflow:hidden;"> </div><div class="winbb" style="display:none"></div><div class="winbc"></div>' +
+	iWin.win[wID].obj.innerHTML = '<div class="winbt" style="white-space:nowrap;overflow:hidden;"> </div>'+ 
+		'<div class="winbb" style="display:none"> </div><div class="winbc"></div>' +
 	'<div style="cursor:nwse-resize;width:20px;height:20px;position:absolute;right:-7px;bottom:-7px;"> </div>';
 	//'<div style="display:none;position:absolute;width:100%;height:100%;top:0;"></div>';// for modal window lock
 	/*"<img src=\"/img/refresh.png\" onclick=\"bref('"+id+"')\" /> "+*/
@@ -206,43 +208,48 @@ iWin.setContentDimensionsAuto = function(wID)
 	return true;
 }
 
-
 iWin.showTab = function(tID, wID)
 {
-	for (var i = 0; i < iWin.win[wID].obj.children[2].children.length; i++) {
-		if (iWin.win[wID].obj.children[2].children[i].getAttribute('data-id') == tID)
-			iWin.win[wID].obj.children[2].children[i].style.display = 'block';
-		else
-			iWin.win[wID].obj.children[2].children[i].style.display = 'none';
+	for (var _tID in iWin.win[wID].tabs) {
+		if (tID == _tID) {
+			iWin.win[wID].tabs[_tID].contentObj.style.display = 'block';
+			iWin.win[wID].tabs[_tID].tabObj.classList.add('open');
+		} else {
+			iWin.win[wID].tabs[_tID].contentObj.style.display = 'none';
+			iWin.win[wID].tabs[_tID].tabObj.classList.remove('open');
+		}
 	}
 	return true;
-}
+};
 
 iWin.setTabs = function(tabs, wID)
 {
-	var first = '';
+	iWin.win[wID].tabs = {};
+	var first = null;
 	iWin.win[wID].obj.children[1].innerHTML = '';
 	for (var id in tabs) {
-		if (typeof(id) == 'undefined') continue;
+		var contentObj = iWin.win[wID].obj.children[2].querySelectorAll('[data-id="'+id+'"]')[0];
+		if (typeof(contentObj) == 'undefined') continue;
 		
-		if (!first.length) {first = id;}
+		var tabObj = document.createElement('div');
+		tabObj.className = 'winbbt';
+		(function(id, wID){tabObj.onclick = function(e){iWin.showTab(id, wID);};})(id, wID);
+		tabObj.innerHTML = tabs[id];
+
+		iWin.win[wID].tabs[id] = {text:tabs[id], tabObj:tabObj, contentObj:contentObj};
+		if (first == null) {first = id;}
 		
-		var obj = document.createElement('div');
-		obj.className = 'winbbt';
-		(function(id, wID){obj.onclick = function(){iWin.showTab(id, wID);};})(id, wID);
-		obj.innerHTML = tabs[id];
-		
-		iWin.win[wID].obj.children[1].appendChild(obj);
+		iWin.win[wID].obj.children[1].appendChild(tabObj);
 	}
 	
-	if (first.length) {
-		iWin.win[wID].obj.children[1].style.display = 'block';
+	if (first != null) {
+		iWin.win[wID].obj.children[1].style.display = 'table';
 		iWin.showTab(first, wID);
 	} else {
 		iWin.win[wID].obj.children[1].style.display = 'none';
 	}
 	return true;
-}
+};
 
 iWin.zAdd = function(wID)
 {
