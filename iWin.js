@@ -77,13 +77,15 @@ iWin.create = function(param, wID)
 	return true;
 }
 
-iWin.destroy = function(wID)
+iWin.destroy = function(wID, e)
 {
 	if (typeof iWin.win[wID] == 'undefined') return false;
+	var evt = e || window.event;
+	
 	iWin.zRemove(wID);
 	document.body.removeChild(iWin.win[wID].obj);
 	delete iWin.win[wID];
-	if (typeof event != 'undefined') event.stopPropagation();
+	if (typeof evt != 'undefined') evt.stopPropagation();
 	return true;
 }
 
