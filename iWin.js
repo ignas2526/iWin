@@ -18,23 +18,23 @@ var iWin = {};
 
 iWin.init = function()
 {
-  iWin.win = {};
-  iWin.dragwID = null;
-  iWin.dragObj = -1;
-  iWin.dragSTop = null;
-  iWin.dragSleft = null;
-  iWin.dragMouseX = null;
-  iWin.dragMouseY = null;
+	iWin.win = {};
+	iWin.dragwID = null;
+	iWin.dragObj = -1;
+	iWin.dragSTop = null;
+	iWin.dragSleft = null;
+	iWin.dragMouseX = null;
+	iWin.dragMouseY = null;
 
-  iWin.resizeWidth = null;
-  iWin.resizeHeight = null;
+	iWin.resizeWidth = null;
+	iWin.resizeHeight = null;
 
-  iWin.zwin = [];
-  iWin.zindex = 99;
+	iWin.zwin = [];
+	iWin.zindex = 99;
 
-  iWin.scroll_length = 0;
-  iWin.contentMaxAutoWidth = 810;
-  iWin.contentMaxAutoHeight = 610;
+	iWin.scroll_length = 0;
+	iWin.contentMaxAutoWidth = 810;
+	iWin.contentMaxAutoHeight = 610;
 
 
 	var tmpDiv = document.createElement('div');
@@ -343,14 +343,14 @@ iWin.MoveStop = function()
 iWin.messageBox = function(msg, params, _wID) // _wID will be used in future for modal messageBox
 {
 	var wID = 'iAlert' + new Date().getTime();
-  iWin.create({title: params.title, onclose:function(){iWin.destroy(wID)}}, wID);
-  iWin.setContent(msg, true, wID);
-  iWin.setPosition(60, (window.innerWidth / 2) - 20, wID);
-  iWin.show(wID);
-  iWin.toFront(wID);
-  iWin.show(wID);
-  if (typeof params.timeout != 'undefined')
-  	setTimeout(function(){iWin.destroy(wID)}, parseInt(params.timeout, 10));
+	iWin.create({title: params.title, onclose:function(){iWin.destroy(wID)}}, wID);
+	iWin.setContent(msg, true, wID);
+	iWin.setPosition(60, (window.innerWidth / 2) - 20, wID);
+	iWin.show(wID);
+	iWin.toFront(wID);
+	iWin.show(wID);
+	if (typeof params.timeout != 'undefined')
+	setTimeout(function(){iWin.destroy(wID)}, parseInt(params.timeout, 10));
 	return true;
 }
 
