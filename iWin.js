@@ -74,7 +74,8 @@ iWin.create = function(param, wID)
 
 	iWin.win[wID].contentWidth = 0;
 	iWin.win[wID].contentHeight = 0;
-	iWin.win[wID].contentScroll = false;
+	iWin.win[wID].contentScrollHorizontal = false;
+	iWin.win[wID].contentScrollVertical = false;
 
 	iWin.setTitle(param.title, wID);
 	return true;
@@ -142,19 +143,31 @@ iWin.setContentDimensions = function(width, height, wID)
 	iWin.win[wID].contentWidth = parseInt(width, 10);
 	iWin.win[wID].contentHeight = parseInt(height, 10);
 
-	iWin.win[wID].obj.children[2].style.width = (iWin.win[wID].contentWidth + (iWin.win[wID].contentScroll ? iWin.scroll_length : 0)) + 'px';
-	iWin.win[wID].obj.children[2].style.height = iWin.win[wID].contentHeight + 'px';
+	iWin.win[wID].obj.children[2].style.width = (iWin.win[wID].contentWidth + (iWin.win[wID].contentScrollVertical ? iWin.scroll_length : 0)) + 'px';
+	iWin.win[wID].obj.children[2].style.height = (iWin.win[wID].contentHeight + (iWin.win[wID].contentScrollHorizontal ? iWin.scroll_length : 0)) + 'px';
 
 	return true;
 }
 
-iWin.setContentScroll = function(scroll, wID)
+iWin.setContentScroll = function(scrollHorizontal, scrollVertical, wID)
 {
-	iWin.win[wID].contentScroll = scroll ? true : false;
+	iWin.win[wID].contentScrollHorizontal = scrollHorizontal ? true : false;
+	iWin.win[wID].contentScrollVertical = scrollVertical ? true : false;
 
-	if (iWin.win[wID].contentScroll) {
+	if (iWin.win[wID].contentScrollVertical) {
 		iWin.win[wID].obj.children[2].style.overflowY = 'scroll';
 		iWin.win[wID].obj.children[2].style.width = (iWin.win[wID].contentWidth + iWin.scroll_length) + 'px';
+	} else {
+		iWin.win[wID].obj.children[2].style.overflowY = 'hidden';
+		iWin.win[wID].obj.children[2].style.width = iWin.win[wID].contentWidth + 'px';
+	}
+
+	if (iWin.win[wID].contentScrollHorizontal) {
+		iWin.win[wID].obj.children[2].style.overflowX = 'scroll';
+		iWin.win[wID].obj.children[2].style.height = (iWin.win[wID].contentHeight + iWin.scroll_length) + 'px';
+	} else {
+		iWin.win[wID].obj.children[2].style.overflowX = 'hidden';
+		iWin.win[wID].obj.children[2].style.height = iWin.win[wID].contentHeight + 'px';
 	}
 
 	return true;
@@ -194,12 +207,10 @@ iWin.setContentDimensionsAuto = function(wID)
 		iWin.win[wID].contentScroll = true;
 	} else if (iWin.win[wID].contentHeight < 10) iWin.win[wID].contentHeight = 10;
 
-	if (iWin.win[wID].contentScroll) {
-		iWin.win[wID].obj.children[2].style.overflowY = 'scroll';
-		iWin.win[wID].obj.children[2].style.width = (iWin.win[wID].contentWidth + iWin.scroll_length) + 'px';
-	}
 	iWin.win[wID].obj.children[2].style.height = iWin.win[wID].contentHeight + 'px';
 
+	iWin.setContentScroll(iWin.win[wID].contentScrollHorizontal, iWin.win[wID].contentScrollVertical, wID);
+	
 	iWin.win[wID].obj.style.top = posTop + 'px';
 	iWin.win[wID].obj.style.left = posLeft + 'px';
 
@@ -299,13 +310,14 @@ iWin.drag = function(wID, e)
 
 iWin.resize = function(wID, e)
 {
+	var evt = e || window.event;
 	if (iWin.dragObj != -1) iWin.MoveStop(); // prevent multiple drags
 	iWin.dragwID = wID;
 	iWin.dragObj = iWin.win[wID].obj;
 
-	iWin.dragMouseX = e.clientX; iWin.dragMouseY = e.clientY;
-	iWin.resizeWidth = iWin.win[wID].contentWidth + (iWin.win[wID].contentScroll ? iWin.scroll_length : 0);
-  iWin.resizeHeight = iWin.win[wID].contentHeight;
+	iWin.dragMouseX = evt.clientX; iWin.dragMouseY = evt.clientY;
+	iWin.resizeWidth = iWin.win[wID].contentWidth + (iWin.win[wID].contentScrollVertical ? iWin.scroll_length : 0);
+	iWin.resizeHeight = iWin.win[wID].contentHeight + (iWin.win[wID].contentScrollHorizontal ? iWin.scroll_length : 0);
 
 	document.body.className = 'nse';
 	document.addEventListener('mousemove', iWin.resizeM);
