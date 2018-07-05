@@ -33,6 +33,8 @@ iWin.init = function(param)
 	iWin.zindex = 99;
 
 	iWin.scroll_length = 0;
+	iWin.contentMinAutoWidth = 10;
+	iWin.contentMinAutoHeight = 10;
 	iWin.contentMaxAutoWidth = 810;
 	iWin.contentMaxAutoHeight = 610;
 	iWin.onSetTitle = typeof param.onSetTitle != 'function' ? function(wID, obj, title) {obj.innerText = title;} : param.onSetTitle;
@@ -192,7 +194,7 @@ iWin.setContent = function(content, autoSize, wID)
 {
 	iWin.win[wID].obj.children[2].innerHTML = content;
 
-	if (autoSize) iWin.setContentDimensionsAuto(wID)
+	if (autoSize) iWin.setContentDimensionsAuto(wID);
 	return true;
 }
 
@@ -252,9 +254,19 @@ iWin.setContentDimensionsAuto = function(wID)
 	iWin.win[wID].obj.children[2].style.width = 'auto';
 	iWin.win[wID].obj.children[2].style.height = 'auto';
 	iWin.win[wID].obj.children[2].style.overflow = '';
+
+	// Make all tabs visible before computing height
+	var visibleTab = null;
+	for (var tID in iWin.win[wID].tabs) {
+		if (iWin.win[wID].tabs[tID].contentObj.style.display == 'block') {
+			visibleTab = tID;
+		} else {
+			iWin.win[wID].tabs[tID].contentObj.style.display = 'block';
+		}
+	}
 	
 	iWin.win[wID].contentWidth = iWin.win[wID].obj.children[2].scrollWidth;
-	if (iWin.win[wID].contentWidth < 10) iWin.win[wID].contentWidth = 10;
+	if (iWin.win[wID].contentWidth < iWin.contentMinAutoWidth) iWin.win[wID].contentWidth = iWin.contentMinAutoWidth;
 	else if (iWin.win[wID].contentWidth > iWin.contentMaxAutoWidth) iWin.win[wID].contentWidth = iWin.contentMaxAutoWidth;
 
 	iWin.win[wID].obj.children[2].style.width = iWin.win[wID].contentWidth + 'px';
@@ -263,10 +275,19 @@ iWin.setContentDimensionsAuto = function(wID)
 	if (iWin.win[wID].contentHeight > iWin.contentMaxAutoHeight) {
 		iWin.win[wID].contentHeight = iWin.contentMaxAutoHeight;
 		iWin.win[wID].contentScroll = true;
-	} else if (iWin.win[wID].contentHeight < 10) iWin.win[wID].contentHeight = 10;
+	} else if (iWin.win[wID].contentHeight < iWin.contentMinAutoHeight) iWin.win[wID].contentHeight = iWin.contentMinAutoHeight;
 
 	iWin.win[wID].obj.children[2].style.height = iWin.win[wID].contentHeight + 'px';
 
+	// Set tabs back
+	for (var tID in iWin.win[wID].tabs) {
+		if (tID == visibleTab ) {
+			iWin.win[wID].tabs[tID].contentObj.style.display = 'block';
+		} else {
+			iWin.win[wID].tabs[tID].contentObj.style.display = 'none';
+		}
+	}
+	
 	iWin.setContentScroll(iWin.win[wID].contentScrollHorizontal, iWin.win[wID].contentScrollVertical, wID);
 	
 	iWin.win[wID].obj.style.top = posTop + 'px';
