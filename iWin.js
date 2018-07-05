@@ -66,10 +66,14 @@ iWin.create = function(param, wID)
 	iWin.win[wID].onhide = typeof param.onhide == 'function' ? param.onhide : function(){};
 	iWin.win[wID].onclose = typeof param.onclose == 'function' ? param.onclose : function(){};
 	iWin.win[wID].onrefresh = typeof param.onrefresh == 'function' ? param.onrefresh : function(){};
-
-	iWin.win[wID].obj.addEventListener('mousedown', function(e) {iWin.toFront(wID);}, 0);
-	iWin.win[wID].obj.children[0].addEventListener('mousedown', function(e) {iWin.drag(wID, e);}, 0);
-	iWin.win[wID].obj.children[3].addEventListener('mousedown', function(e) {iWin.resize(wID, e);}, 0);
+	
+	// Capture phase first
+	iWin.addEvent(iWin.win[wID].obj, 'press', function(){iWin.toFront(wID);}, true);
+	
+	// Bubble phase third: move window
+	iWin.addEvent(iWin.win[wID].obj.children[0], 'start', function(e) {iWin.drag(wID, e);}, false);
+	
+	iWin.addEvent(iWin.win[wID].obj.children[3], 'start', function(e) {iWin.resize(wID, e);}, true);
 
 	iWin.win[wID].contentWidth = 0;
 	iWin.win[wID].contentHeight = 0;
@@ -79,6 +83,59 @@ iWin.create = function(param, wID)
 	iWin.setTitle(param.title, wID);
 	return true;
 }
+
+iWin.addEvent = function(object, event, callback, bubbles, passive)
+{
+	passive = typeof passive == 'undefined' ? false : passive;
+	
+	if (iWin.passiveEvents) {
+		var opts = {passive: passive, capture: bubbles};
+	} else {
+		var opts = bubbles;
+	}
+
+	switch(event) {
+		// Start implies that there will be an end event. Press means either a single click or a tap event.
+		case 'start': case 'press':
+			object.addEventListener('touchstart', callback, opts);
+			object.addEventListener('mousedown', callback, opts);
+		break;
+		case 'move':
+			object.addEventListener('touchmove', callback, opts);
+			object.addEventListener('mousemove', callback, opts);
+		break;
+		case 'end':
+			object.addEventListener('touchend', callback, opts);
+			object.addEventListener('mouseup', callback, opts);
+		break;
+	}
+}
+
+iWin.removeEvent = function(object, event, callback, bubbles, passive)
+{
+	passive = typeof passive == 'undefined' ? false : passive;
+	if (iWin.passiveEvents) {
+		var opts = {passive: passive, capture: bubbles};
+	} else {
+		var opts = bubbles;
+	}
+
+	switch(event) {
+		case 'start': case 'press':
+			object.removeEventListener('touchstart', callback, opts);
+			object.removeEventListener('mousedown', callback, opts);
+		break;
+		case 'move':
+			object.removeEventListener('touchmove', callback, opts);
+			object.removeEventListener('mousemove', callback, opts);
+		break;
+		case 'end':
+			object.removeEventListener('touchend', callback, opts);
+			object.removeEventListener('mouseup', callback, opts);
+		break;
+	}
+}
+
 
 iWin.destroy = function(wID, e)
 {
@@ -301,9 +358,9 @@ iWin.drag = function(wID, e)
 	iWin.dragMouseX = e.clientX; iWin.dragMouseY = e.clientY;
 	iWin.dragSTop = iWin.dragObj.offsetTop; iWin.dragSLeft = iWin.dragObj.offsetLeft;
 
-	document.body.className = 'nse';	
-	document.addEventListener('mousemove', iWin.dragM);
-	document.addEventListener('mouseup', iWin.MoveStop);
+	document.body.className = 'nse';
+	iWin.addEvent(document, 'move', iWin.dragM, true);
+	iWin.addEvent(document, 'end', iWin.MoveStop, true);
 	return true;
 }
 
@@ -319,8 +376,8 @@ iWin.resize = function(wID, e)
 	iWin.resizeHeight = iWin.win[wID].contentHeight + (iWin.win[wID].contentScrollHorizontal ? iWin.scroll_length : 0);
 
 	document.body.className = 'nse';
-	document.addEventListener('mousemove', iWin.resizeM);
-	document.addEventListener('mouseup', iWin.MoveStop);
+	iWin.addEvent(document, 'move', iWin.resizeM, true);
+	iWin.addEvent(document, 'end', iWin.MoveStop, true);
 	return true;
 }
 
@@ -353,9 +410,9 @@ iWin.dragM = function(e)
 iWin.MoveStop = function()
 {
 	document.body.className = '';
-	document.removeEventListener('mousemove', iWin.resizeM);
-	document.removeEventListener('mousemove', iWin.dragM);
-	document.removeEventListener('mouseup', iWin.MoveStop);
+	iWin.removeEvent(document, 'move', iWin.resizeM, true);
+	iWin.removeEvent(document, 'move', iWin.dragM, true);
+	iWin.removeEvent(document, 'end', iWin.MoveStop, true);
 	iWin.dragObj = -1;
 
 	if (document.selection && document.selection.empty) {document.selection.empty();}else if (window.getSelection) {window.getSelection().removeAllRanges();}
