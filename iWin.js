@@ -358,7 +358,7 @@ iWin.drag = function(wID, e)
 	iWin.dragMouseX = e.clientX; iWin.dragMouseY = e.clientY;
 	iWin.dragSTop = iWin.dragObj.offsetTop; iWin.dragSLeft = iWin.dragObj.offsetLeft;
 
-	document.body.className = 'nse';
+	document.body.classList.add('nse');
 	iWin.addEvent(document, 'move', iWin.dragM, true);
 	iWin.addEvent(document, 'end', iWin.MoveStop, true);
 	return true;
@@ -375,7 +375,7 @@ iWin.resize = function(wID, e)
 	iWin.resizeWidth = iWin.win[wID].contentWidth + (iWin.win[wID].contentScrollVertical ? iWin.scroll_length : 0);
 	iWin.resizeHeight = iWin.win[wID].contentHeight + (iWin.win[wID].contentScrollHorizontal ? iWin.scroll_length : 0);
 
-	document.body.className = 'nse';
+	document.body.classList.add('nse');
 	iWin.addEvent(document, 'move', iWin.resizeM, true);
 	iWin.addEvent(document, 'end', iWin.MoveStop, true);
 	return true;
@@ -409,7 +409,7 @@ iWin.dragM = function(e)
 
 iWin.MoveStop = function()
 {
-	document.body.className = '';
+	document.body.classList.remove('nse');
 	iWin.removeEvent(document, 'move', iWin.resizeM, true);
 	iWin.removeEvent(document, 'move', iWin.dragM, true);
 	iWin.removeEvent(document, 'end', iWin.MoveStop, true);
