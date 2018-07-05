@@ -55,8 +55,10 @@ iWin.create = function(param, wID)
 	iWin.win[wID].obj = document.createElement('div');
 	iWin.win[wID].obj.className = "winb";
 	iWin.win[wID].obj.style.cssText = "display:none;top:50px;left:20px;";
-	iWin.win[wID].obj.innerHTML = '<div class="winbt" style="white-space:nowrap;overflow:hidden;"> </div>'+ 
-		'<div class="winbb" style="display:none"> </div><div class="winbc"></div>' +
+	iWin.win[wID].obj.innerHTML =
+		'<div class="winbt" style="white-space:nowrap;overflow:hidden;"> </div>'+
+		'<div class="winbb" style="display:none"> </div>'+
+		'<div class="winbc"> </div>'+
 	'<div style="cursor:nwse-resize;width:20px;height:20px;position:absolute;right:-7px;bottom:-7px;"> </div>';
 	//'<div style="display:none;position:absolute;width:100%;height:100%;top:0;"></div>';// for modal window lock
 	/*"<img src=\"/img/refresh.png\" onclick=\"bref('"+id+"')\" /> "+*/
@@ -295,7 +297,7 @@ iWin.setTabs = function(tabs, wID)
 	var first = null;
 	iWin.win[wID].obj.children[1].innerHTML = '';
 	for (var id in tabs) {
-		var contentObj = iWin.win[wID].obj.children[2].querySelectorAll('[data-id="'+id+'"]')[0];
+		var contentObj = iWin.win[wID].obj.children[2].querySelectorAll('[data-iwin-tabid="'+id+'"]')[0];
 		if (typeof(contentObj) == 'undefined') continue;
 		
 		var tabObj = document.createElement('div');
