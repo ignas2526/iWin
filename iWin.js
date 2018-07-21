@@ -88,6 +88,29 @@ iWin.create = function(param, wID)
 	return true;
 }
 
+iWin.createPlane = function(param, wID)
+{
+	if (typeof iWin.win[wID] != 'undefined') return false;
+	
+	iWin.win[wID] = {};
+	iWin.win[wID].type = 'plane';
+	iWin.win[wID].wID = wID;
+	iWin.win[wID].obj = document.createElement('div');
+	iWin.win[wID].obj.className = "winp";
+	iWin.win[wID].obj.style.cssText = "display:none;position:absolute;top:0;left:0;width:100%;height:100%";
+
+	document.body.appendChild(iWin.win[wID].obj);
+
+	iWin.win[wID].onShow = typeof param.onShow == 'function' ? param.onShow : function(){};
+	iWin.win[wID].onHide = typeof param.onHide == 'function' ? param.onHide : function(){};
+	iWin.win[wID].onClose = typeof param.onClose == 'function' ? param.onClose : function(){};
+	iWin.win[wID].onPress = typeof param.onPress == 'function' ? param.onPress : function(){};
+
+	// Capture phase first
+	iWin.addEvent(iWin.win[wID].obj, 'press', function(){iWin.win[wID].onPress(wID);}, true);
+	return true;
+}
+
 iWin.addEvent = function(object, event, callback, bubbles, passive)
 {
 	passive = typeof passive == 'undefined' ? false : passive;
