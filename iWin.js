@@ -96,18 +96,19 @@ iWin.createPlane = function(param, wID)
 	iWin.win[wID].type = 'plane';
 	iWin.win[wID].wID = wID;
 	iWin.win[wID].obj = document.createElement('div');
-	iWin.win[wID].obj.className = "winp";
-	iWin.win[wID].obj.style.cssText = "display:none;position:absolute;top:0;left:0;width:100%;height:100%";
+	iWin.win[wID].obj.className = 'winp';
+	iWin.win[wID].obj.style.cssText = 'display:none;position:absolute;top:0;left:0;width:100%;height:100%';
 
 	document.body.appendChild(iWin.win[wID].obj);
 
 	iWin.win[wID].onShow = typeof param.onShow == 'function' ? param.onShow : function(){};
+	iWin.win[wID].onDestroy = typeof param.onDestroy == 'function' ? param.onDestroy : function(){};
 	iWin.win[wID].onHide = typeof param.onHide == 'function' ? param.onHide : function(){};
 	iWin.win[wID].onClose = typeof param.onClose == 'function' ? param.onClose : function(){};
 	iWin.win[wID].onPress = typeof param.onPress == 'function' ? param.onPress : function(){};
 
 	// Capture phase first
-	iWin.addEvent(iWin.win[wID].obj, 'press', function(){iWin.win[wID].onPress(wID);}, true);
+	iWin.addEvent(iWin.win[wID].obj, 'press', function(e){iWin.win[wID].onPress(wID, e);}, true);
 	return true;
 }
 
