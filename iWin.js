@@ -66,9 +66,10 @@ iWin.create = function(param, wID)
 		'<div class="winbt" style="white-space:nowrap;overflow:hidden;"> </div>'+
 		'<div class="winbb" style="display:none"> </div>'+
 		'<div class="winbc"> </div>'+
-	'<div style="cursor:nwse-resize;width:20px;height:20px;position:absolute;right:-7px;bottom:-7px;"> </div>';
+		'<div class="winr tl"> </div><div class="winr tt"> </div><div class="winr tr"> </div>'+
+		'<div class="winr ll"> </div><div class="winr rr"> </div>'+
+		'<div class="winr bl"> </div><div class="winr bb"> </div><div class="winr br"> </div>';
 	//'<div style="display:none;position:absolute;width:100%;height:100%;top:0;"></div>';// for modal window lock
-	/*"<img src=\"/img/refresh.png\" onclick=\"bref('"+id+"')\" /> "+*/
 	document.body.appendChild(iWin.win[wID].obj);
 	
 	iWin.win[wID].onShow = typeof param.onShow == 'function' ? param.onShow : function(){};
@@ -78,11 +79,28 @@ iWin.create = function(param, wID)
 	
 	// Capture phase first
 	iWin.addEvent(iWin.win[wID].obj, 'press', function(){iWin.toFront(wID);}, true);
-	
+
 	// Bubble phase third: move window
-	iWin.addEvent(iWin.win[wID].obj.children[0], 'start', function(e) {iWin.drag(wID, e);}, false);
+	iWin.addEvent(iWin.win[wID].obj.children[0], 'start', function(e) {iWin.resize(wID, {moveT:1, moveL:1}, e);}, false);
 	
-	iWin.addEvent(iWin.win[wID].obj.children[3], 'start', function(e) {iWin.resize(wID, e);}, true);
+	// Top Left
+	iWin.addEvent(iWin.win[wID].obj.children[3], 'start', function(e) {iWin.resize(wID, {moveT:1, moveB:1, invertB:1, moveL:1, moveR:1, invertR:1}, e);}, true);
+	// Top Top
+	iWin.addEvent(iWin.win[wID].obj.children[4], 'start', function(e) {iWin.resize(wID, {moveT:1, moveB:1, invertB:1}, e);}, true);
+	// Top Right
+	iWin.addEvent(iWin.win[wID].obj.children[5], 'start', function(e) {iWin.resize(wID, {moveT:1, moveB:1, invertB:1, moveR:1}, e);}, true);
+
+	// Left left
+	iWin.addEvent(iWin.win[wID].obj.children[6], 'start', function(e) {iWin.resize(wID, {moveL:1, moveR:1, invertR:1}, e);}, true);
+	// Right Right
+	iWin.addEvent(iWin.win[wID].obj.children[7], 'start', function(e) {iWin.resize(wID, {moveR:1}, e);}, true);
+
+	// Bottom Left
+	iWin.addEvent(iWin.win[wID].obj.children[8], 'start', function(e) {iWin.resize(wID, {moveB:1, moveL:1, moveR:1, invertR:1}, e);}, true);
+	// Bottom Bottom
+	iWin.addEvent(iWin.win[wID].obj.children[9], 'start', function(e) {iWin.resize(wID, {moveB:1}, e);}, true);
+	// Bottom Right
+	iWin.addEvent(iWin.win[wID].obj.children[10], 'start', function(e) {iWin.resize(wID, {moveB:1, moveR:1}, e);}, true);
 
 	iWin.win[wID].contentWidth = 0;
 	iWin.win[wID].contentHeight = 0;
@@ -416,11 +434,29 @@ iWin.drag = function(wID, e)
 iWin.resize = function(wID, e)
 {
 	var evt = e || window.event;
-	if (iWin.dragObj != -1) iWin.MoveStop(); // prevent multiple drags
+	if (iWin.dragObj != -1) iWin.MoveStop(); // there can be only one resize
 	iWin.dragwID = wID;
 	iWin.dragObj = iWin.win[wID].obj;
 
-	iWin.dragMouseX = evt.clientX; iWin.dragMouseY = evt.clientY;
+	if (evt.touches) {
+		iWin.dragStartX = parseInt(evt.touches[0].clientX, 10);
+		iWin.dragStartY = parseInt(evt.touches[0].clientY, 10);
+	} else {
+		iWin.dragStartX = evt.clientX;
+		iWin.dragStartY = evt.clientY;
+	}
+	
+	iWin.dragSTop = iWin.dragObj.offsetTop;
+	iWin.dragSLeft = iWin.dragObj.offsetLeft;
+	
+	iWin.windowMoveT =  params.moveT ? true : false;
+	iWin.windowMoveR =  params.moveR ? true : false;
+	iWin.windowMoveB =  params.moveB ? true : false;
+	iWin.windowMoveL =  params.moveL ? true : false;
+
+	iWin.windowMoveInvertB =  params.invertB ? true : false;
+	iWin.windowMoveInvertR =  params.invertR ? true : false;
+	
 	iWin.resizeWidth = iWin.win[wID].contentWidth + (iWin.win[wID].contentScrollVertical ? iWin.scroll_length : 0);
 	iWin.resizeHeight = iWin.win[wID].contentHeight + (iWin.win[wID].contentScrollHorizontal ? iWin.scroll_length : 0);
 
@@ -436,7 +472,7 @@ iWin._windowMove = function(e)
 	evt.preventDefault();
 
 	var wID = iWin.dragwID;
-	
+
 	var clientY, clientX;
 	if (evt.touches) {
 		clientX = parseInt(evt.touches[0].clientX, 10);
@@ -446,26 +482,65 @@ iWin._windowMove = function(e)
 		clientY = evt.clientY;
 	}
 	
-	iWin.win[wID].contentWidth = iWin.resizeWidth + clientX - iWin.dragStartX;
-	if (iWin.win[wID].contentWidth < 100) iWin.win[wID].contentWidth = 100;
-	iWin.win[wID].obj.children[2].style.width = iWin.win[wID].contentWidth + 'px';
+	if (iWin.windowMoveB) {
+		if (iWin.windowMoveInvertB && (iWin.resizeHeight - clientY + iWin.dragStartY) < iWin.contentMinHeight) {
+			clientY = -iWin.contentMinHeight + iWin.dragStartY + iWin.resizeHeight;
+		} else if (!iWin.windowMoveInvertB && (iWin.resizeHeight + clientY - iWin.dragStartY) < iWin.contentMinHeight) {
+			clientY = iWin.contentMinHeight + iWin.dragStartY - iWin.resizeHeight;
+		}
+	}
 
-	iWin.win[wID].contentHeight = iWin.resizeHeight + clientY - iWin.dragStartY;
-	if (iWin.win[wID].contentHeight < 20) iWin.win[wID].contentHeight = 20;
-	iWin.win[wID].obj.children[2].style.height = iWin.win[wID].contentHeight + 'px';
-}
+	if (iWin.windowMoveT && (iWin.dragSTop + clientY - iWin.dragStartY) < iWin.offsetTop) {
+		clientY = iWin.offsetTop + iWin.dragStartY - iWin.dragSTop;
+	}
 
-iWin.dragM = function(e)
-{
-	var by = iWin.dragSTop + e.clientY - iWin.dragMouseY;
-	if (by < 40) by = 40;
-	if (by > (window.innerHeight - 10)) by = window.innerHeight - 10;
-	
-	var bx = iWin.dragSLeft + e.clientX - iWin.dragMouseX;
-	if (e.clientX < 5) bx = iWin.dragSLeft + 5 - iWin.dragMouseX;
-	if (bx > (window.innerWidth - 10)) bx = window.innerWidth - 10;
-	
-	iWin.dragObj.style.top = by + 'px'; iWin.dragObj.style.left = bx + 'px';
+	if (iWin.windowMoveR) {
+		if (iWin.windowMoveInvertR && (iWin.resizeWidth - clientX + iWin.dragStartX) < iWin.contentMinWidth) {
+			clientX = -iWin.contentMinWidth + iWin.dragStartX + iWin.resizeWidth;
+		} else if (!iWin.windowMoveInvertR && (iWin.resizeWidth + clientX - iWin.dragStartX) < iWin.contentMinWidth) {
+			clientX = iWin.contentMinWidth + iWin.dragStartX - iWin.resizeWidth;
+		}
+	}
+
+	if (iWin.windowMoveL && (iWin.dragSLeft + clientX - iWin.dragStartX) < iWin.offsetLeft) {
+		clientX = iWin.offsetLeft + iWin.dragStartX - iWin.dragSLeft;
+	}
+
+	if (iWin.windowMoveT) {
+		var NewWindowY = iWin.dragSTop + clientY - iWin.dragStartY;
+
+		if (NewWindowY > (window.innerHeight - 10)) NewWindowY = window.innerHeight - 10;
+		iWin.dragObj.style.top = NewWindowY + 'px';
+	}
+
+	if (iWin.windowMoveB) {
+		if (iWin.windowMoveInvertB) {
+			iWin.win[wID].contentHeight = iWin.resizeHeight - clientY + iWin.dragStartY;
+		} else {
+			iWin.win[wID].contentHeight = iWin.resizeHeight + clientY - iWin.dragStartY;
+		}
+		
+		iWin.win[wID].obj.children[2].style.height = iWin.win[wID].contentHeight + 'px';
+	}
+
+	if (iWin.windowMoveL) {
+		var NewWindowX = iWin.dragSLeft + clientX - iWin.dragStartX;
+		
+		if (NewWindowX > (window.innerWidth - 10)) NewWindowX = window.innerWidth - 10;
+		
+		iWin.dragObj.style.left = NewWindowX + 'px';
+	}
+
+	if (iWin.windowMoveR) {
+		if (iWin.windowMoveInvertR) {
+			iWin.win[wID].contentWidth = iWin.resizeWidth - clientX + iWin.dragStartX;
+		} else {
+			iWin.win[wID].contentWidth = iWin.resizeWidth + clientX - iWin.dragStartX;
+		}
+		
+		iWin.win[wID].obj.children[0].style.width = iWin.win[wID].contentWidth + 'px';
+		iWin.win[wID].obj.children[2].style.width = iWin.win[wID].contentWidth + 'px';
+	}
 }
 
 iWin.MoveStop = function(e)
@@ -475,7 +550,6 @@ iWin.MoveStop = function(e)
 
 	document.body.classList.remove('nse');
 	iWin.removeEvent(document, 'move', iWin._windowMove, true);
-	iWin.removeEvent(document, 'move', iWin.dragM, true);
 	iWin.removeEvent(document, 'end', iWin.MoveStop, true);
 
 	iWin.dragObj = -1;
