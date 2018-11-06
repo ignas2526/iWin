@@ -50,7 +50,14 @@ iWin.init = function(param)
 	document.body.appendChild(tmpDiv);
 	iWin.scroll_length = tmpDiv.offsetWidth - tmpDiv.clientWidth;
 	document.body.removeChild(tmpDiv);
-}
+
+	// Detect if passive events are present. Added with Chrome 51, prevents preventDefault() function in the events
+	iWin.passiveEvents = false;
+	try {
+	  var opts = Object.defineProperty({}, 'passive', {get: function(){iWin.passiveEvents = true;}});
+	  window.addEventListener('test', null, opts);
+	} catch (e) {}
+};
 
 iWin.create = function(param, wID)
 {
@@ -186,7 +193,6 @@ iWin.removeEvent = function(object, event, callback, bubbles, passive)
 		break;
 	}
 }
-
 
 iWin.destroy = function(wID, e)
 {
