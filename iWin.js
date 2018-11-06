@@ -583,50 +583,40 @@ iWin.messageBox = function(msg, params, _wID)
 	return wID;
 }
 
-iWin.selectBoxCallback = {function:null, arg:null};
-iWin.selectBox = function(options, callbackFunction, arg, e)
+iWin.createSelect = function(params, wID)
 {
-	var evt = e || window.event;
+	if (typeof wID == 'undefined') wID = 'iWinSelectBox_'+ new Date().getTime().toString(36) + parseInt(Math.random() * 72).toString(36);
 
-	iWin.selectBoxCallback.function = typeof callbackFunction == 'function' ? callbackFunction : function(){};
-	iWin.selectBoxCallback.arg = arg;
+	if (!iWin.create({
+		onClose: function(wID){iWin.hide(wID); iWin.hide(wID+ 'p')},
+		onShow: function(wID){iWin.show(wID+ 'p')},
+		onDestroy: function(wID){iWin.destroy(wID+ 'p')},
+		onHide: function(wID){iWin.hide(wID+ 'p')},
+		class: params.class,
+		type: 'select'}, wID)) return false;
 
-	var wIDplane = 'iWinSelectBoxPlane';
-	var wIDbox = 'iWinSelectBox';
-	iWin.createPlane({onPress:function(wID){iWin.destroy('iWinSelectBoxPlane'); iWin.destroy('iWinSelectBox');}}, wIDplane);
-	iWin.show(wIDplane);
-
-	iWin.create({onClose:iWin.destroy}, wIDbox);
-	var content = '';
-	for (option in options) {
-		content += '<div onclick="iWin.selectBoxOption('+ option + ')">' + options[option] + '</div>';
-	}
-	iWin.setContent(content, true, wIDbox);
-
-	iWin.setWindowOption({'resizable': false}, wIDbox);
-	iWin.show(wIDbox);
-
-	var boxRect = iWin.win['iWinSelectBox'].obj.getBoundingClientRect();
-	var srcRect = evt.target.getBoundingClientRect();
-
-	var boxTop = 0, boxLeft = srcRect.left + (srcRect.width / 2) - (boxRect.width / 2);
-
-	if ((srcRect.top - boxRect.height) < 0) {
-		// Position Below
-		boxTop = srcRect.bottom;
-	} else {
-		// Position Above
-		boxTop = srcRect.top - boxRect.height;
+	iWin.createPlane({onPress:function(wID, e){
+		var evt = e || window.event;
+		iWin.hide(wID.slice(0,-1));
+		iWin.hide(wID);
+		evt.preventDefault();
+	}}, wID + 'p');
+	iWin.win[wID].callback = typeof params.callback == 'function' ? params.callback : function(){};
+	
+	if (typeof params.options != 'undefined') {
+		var content = '';
+		for (option in params.options) {
+			content += '<div class="option option_'+ option+ '"onclick="iWin.onSelectOption('+ option+ ',\''+ wID+ '\')">' + params.options[option] + '</div>';
+		}
+		iWin.setContent(content, wID);
 	}
 
-	iWin.setPosition(boxTop, boxLeft, wIDbox);
-	iWin.show(wIDbox);
-	return true;
+	iWin.setWindowOption({'resizable': false}, wID);
+	return wID;
 }
 
-iWin.selectBoxOption = function(option)
+iWin.onSelectOption = function(option, wID)
 {
-	iWin.destroy('iWinSelectBoxPlane');
-	iWin.destroy('iWinSelectBox');
-	iWin.selectBoxCallback.function(option, iWin.selectBoxCallback.arg);
+	iWin.hide(wID); iWin.hide(wID+ 'p');
+	iWin.win[wID].callback(option, wID);
 }
