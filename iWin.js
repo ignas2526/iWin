@@ -216,13 +216,74 @@ iWin.setContent = function(content, wID)
 	return true;
 }
 
-iWin.setContentDimensions = function(width, height, wID)
+iWin.setContentDimensions = function(param, wID)
 {
-	iWin.win[wID].contentWidth = parseInt(width, 10);
-	iWin.win[wID].contentHeight = parseInt(height, 10);
+	if (!param) param = {};
+	if (typeof param.width == 'undefined') param.width = 'auto';
+	if (typeof param.height == 'undefined') param.height = 'auto';
 
-	iWin.win[wID].obj.children[2].style.width = (iWin.win[wID].contentWidth + (iWin.win[wID].contentScrollVertical ? iWin.scroll_length : 0)) + 'px';
-	iWin.win[wID].obj.children[2].style.height = (iWin.win[wID].contentHeight + (iWin.win[wID].contentScrollHorizontal ? iWin.scroll_length : 0)) + 'px';
+	var posTop = iWin.win[wID].obj.offsetTop, posLeft = iWin.win[wID].obj.offsetLeft;
+	iWin.win[wID].obj.style.top = '-9999px';
+	iWin.win[wID].obj.style.left = '-9999px';
+	var isHidden = iWin.show(wID);
+
+	var visibleTab = null;
+	if (param.width == 'auto' || param.height == 'auto') {
+		iWin.win[wID].obj.children[2].style.width = 'auto';
+		iWin.win[wID].obj.children[2].style.height = 'auto';
+		iWin.win[wID].obj.children[2].style.overflow = 'hidden'; // impartant for proper height calculations
+
+		// Make all tabs visible before computing height
+		for (var tID in iWin.win[wID].tabs) {
+			if (iWin.win[wID].tabs[tID].contentObj.style.display == 'block') {
+				visibleTab = tID;
+			} else {
+				iWin.win[wID].tabs[tID].contentObj.style.display = 'block';
+			}
+		}
+	}
+
+	var ContentRect = iWin.win[wID].obj.children[2].getBoundingClientRect();
+
+	if (param.width == 'auto') {
+		iWin.win[wID].contentWidth = ContentRect.width;
+	} else {
+		iWin.win[wID].contentWidth = parseInt(param.width, 10);
+	}
+
+	if (param.height == 'auto') {
+		iWin.win[wID].contentHeight = ContentRect.height;
+	} else {
+		iWin.win[wID].contentHeight = parseInt(param.height, 10);
+	}
+
+	if (iWin.win[wID].contentWidth < iWin.contentMinAutoWidth) iWin.win[wID].contentWidth = iWin.contentMinAutoWidth;
+	else if (iWin.win[wID].contentWidth > iWin.contentMaxAutoWidth) iWin.win[wID].contentWidth = iWin.contentMaxAutoWidth;
+
+	iWin.win[wID].obj.children[2].style.width = iWin.win[wID].contentWidth + 'px';
+
+	if (iWin.win[wID].contentHeight > iWin.contentMaxAutoHeight) {
+		iWin.win[wID].contentHeight = iWin.contentMaxAutoHeight;
+		iWin.win[wID].contentScroll = true;
+	} else if (iWin.win[wID].contentHeight < iWin.contentMinAutoHeight) iWin.win[wID].contentHeight = iWin.contentMinAutoHeight;
+
+	iWin.win[wID].obj.children[2].style.height = iWin.win[wID].contentHeight + 'px';
+
+	// Set tabs back
+	for (var tID in iWin.win[wID].tabs) {
+		if (tID == visibleTab ) {
+			iWin.win[wID].tabs[tID].contentObj.style.display = 'block';
+		} else {
+			iWin.win[wID].tabs[tID].contentObj.style.display = 'none';
+		}
+	}
+	
+	iWin.setContentScroll(iWin.win[wID].contentScrollHorizontal, iWin.win[wID].contentScrollVertical, wID);
+	
+	iWin.win[wID].obj.style.top = posTop + 'px';
+	iWin.win[wID].obj.style.left = posLeft + 'px';
+
+	if (isHidden) iWin.hide(wID);
 
 	return true;
 }
@@ -255,64 +316,6 @@ iWin.setPosition = function(top, left, wID)
 {
 	iWin.win[wID].obj.style.top = parseInt(top, 10) + 'px';
 	iWin.win[wID].obj.style.left = parseInt(left, 10) + 'px';
-	return true;
-}
-
-iWin.setContentDimensionsAuto = function(wID)
-{
-	// The order of operations is important
-
-	var posTop = iWin.win[wID].obj.offsetTop, posLeft = iWin.win[wID].obj.offsetLeft;
-	
-	iWin.win[wID].obj.style.top = '-9999px';
-	iWin.win[wID].obj.style.left = '-9999px';
-
-	var isHidden = iWin.show(wID);
-
-	iWin.win[wID].obj.children[2].style.width = 'auto';
-	iWin.win[wID].obj.children[2].style.height = 'auto';
-	iWin.win[wID].obj.children[2].style.overflow = '';
-
-	// Make all tabs visible before computing height
-	var visibleTab = null;
-	for (var tID in iWin.win[wID].tabs) {
-		if (iWin.win[wID].tabs[tID].contentObj.style.display == 'block') {
-			visibleTab = tID;
-		} else {
-			iWin.win[wID].tabs[tID].contentObj.style.display = 'block';
-		}
-	}
-	
-	iWin.win[wID].contentWidth = iWin.win[wID].obj.children[2].scrollWidth;
-	if (iWin.win[wID].contentWidth < iWin.contentMinAutoWidth) iWin.win[wID].contentWidth = iWin.contentMinAutoWidth;
-	else if (iWin.win[wID].contentWidth > iWin.contentMaxAutoWidth) iWin.win[wID].contentWidth = iWin.contentMaxAutoWidth;
-
-	iWin.win[wID].obj.children[2].style.width = iWin.win[wID].contentWidth + 'px';
-	
-	iWin.win[wID].contentHeight = iWin.win[wID].obj.children[2].scrollHeight;
-	if (iWin.win[wID].contentHeight > iWin.contentMaxAutoHeight) {
-		iWin.win[wID].contentHeight = iWin.contentMaxAutoHeight;
-		iWin.win[wID].contentScroll = true;
-	} else if (iWin.win[wID].contentHeight < iWin.contentMinAutoHeight) iWin.win[wID].contentHeight = iWin.contentMinAutoHeight;
-
-	iWin.win[wID].obj.children[2].style.height = iWin.win[wID].contentHeight + 'px';
-
-	// Set tabs back
-	for (var tID in iWin.win[wID].tabs) {
-		if (tID == visibleTab ) {
-			iWin.win[wID].tabs[tID].contentObj.style.display = 'block';
-		} else {
-			iWin.win[wID].tabs[tID].contentObj.style.display = 'none';
-		}
-	}
-	
-	iWin.setContentScroll(iWin.win[wID].contentScrollHorizontal, iWin.win[wID].contentScrollVertical, wID);
-	
-	iWin.win[wID].obj.style.top = posTop + 'px';
-	iWin.win[wID].obj.style.left = posLeft + 'px';
-
-	if (isHidden) iWin.hide(wID);
-
 	return true;
 }
 
