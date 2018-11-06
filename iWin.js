@@ -23,9 +23,14 @@ iWin.init = function(param)
 	iWin.dragObj = -1;
 	iWin.dragSTop = null;
 	iWin.dragSleft = null;
-	iWin.dragMouseX = null;
-	iWin.dragMouseY = null;
+	iWin.dragStartX = null;
+	iWin.dragStartY = null;
 
+	iWin.offsetTop = 0;
+	iWin.offsetLeft = 0;
+	iWin.offsetRight = 0;
+	iWin.offsetBottom = 0;
+	
 	iWin.resizeWidth = null;
 	iWin.resizeHeight = null;
 
@@ -420,20 +425,32 @@ iWin.resize = function(wID, e)
 	iWin.resizeHeight = iWin.win[wID].contentHeight + (iWin.win[wID].contentScrollHorizontal ? iWin.scroll_length : 0);
 
 	document.body.classList.add('nse');
-	iWin.addEvent(document, 'move', iWin.resizeM, true);
+	iWin.addEvent(document, 'move', iWin._windowMove, true);
 	iWin.addEvent(document, 'end', iWin.MoveStop, true);
 	return true;
 }
 
-iWin.resizeM = function(e)
+iWin._windowMove = function(e)
 {
+	var evt = e || window.event;
+	evt.preventDefault();
+
 	var wID = iWin.dragwID;
 	
-	iWin.win[wID].contentWidth = iWin.resizeWidth + e.clientX - iWin.dragMouseX;
+	var clientY, clientX;
+	if (evt.touches) {
+		clientX = parseInt(evt.touches[0].clientX, 10);
+		clientY = parseInt(evt.touches[0].clientY, 10);
+	} else {
+		clientX = evt.clientX;
+		clientY = evt.clientY;
+	}
+	
+	iWin.win[wID].contentWidth = iWin.resizeWidth + clientX - iWin.dragStartX;
 	if (iWin.win[wID].contentWidth < 100) iWin.win[wID].contentWidth = 100;
 	iWin.win[wID].obj.children[2].style.width = iWin.win[wID].contentWidth + 'px';
 
-	iWin.win[wID].contentHeight = iWin.resizeHeight + e.clientY - iWin.dragMouseY;
+	iWin.win[wID].contentHeight = iWin.resizeHeight + clientY - iWin.dragStartY;
 	if (iWin.win[wID].contentHeight < 20) iWin.win[wID].contentHeight = 20;
 	iWin.win[wID].obj.children[2].style.height = iWin.win[wID].contentHeight + 'px';
 }
@@ -451,15 +468,21 @@ iWin.dragM = function(e)
 	iWin.dragObj.style.top = by + 'px'; iWin.dragObj.style.left = bx + 'px';
 }
 
-iWin.MoveStop = function()
+iWin.MoveStop = function(e)
 {
+	var evt = e || window.event;
+	evt.preventDefault();
+
 	document.body.classList.remove('nse');
-	iWin.removeEvent(document, 'move', iWin.resizeM, true);
+	iWin.removeEvent(document, 'move', iWin._windowMove, true);
 	iWin.removeEvent(document, 'move', iWin.dragM, true);
 	iWin.removeEvent(document, 'end', iWin.MoveStop, true);
+
 	iWin.dragObj = -1;
 
-	if (document.selection && document.selection.empty) {document.selection.empty();}else if (window.getSelection) {window.getSelection().removeAllRanges();}
+	if (document.selection && document.selection.empty) {document.selection.empty();} else if (window.getSelection) {window.getSelection().removeAllRanges();}
+	
+	iWin.win[iWin.dragwID].onResize(iWin.dragwID);
 }
 
 iWin.messageBox = function(msg, params, _wID) // _wID will be used in future for modal messageBox
