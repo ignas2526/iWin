@@ -210,11 +210,9 @@ iWin.setTitle = function(title, wID)
 	return true;
 }
 
-iWin.setContent = function(content, autoSize, wID)
+iWin.setContent = function(content, wID)
 {
 	iWin.win[wID].obj.children[2].innerHTML = content;
-
-	if (autoSize) iWin.setContentDimensionsAuto(wID);
 	return true;
 }
 
