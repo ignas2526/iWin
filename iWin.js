@@ -568,18 +568,19 @@ iWin.MoveStop = function(e)
 	iWin.win[iWin.dragwID].onResize(iWin.dragwID);
 }
 
-iWin.messageBox = function(msg, params, _wID) // _wID will be used in future for modal messageBox
+iWin.messageBox = function(msg, params, _wID)
 {
-	var wID = 'iAlert' + new Date().getTime();
-	iWin.create({title: params.title, onclose:function(){iWin.destroy(wID)}}, wID);
-	iWin.setContent(msg, true, wID);
-	iWin.setPosition(60, (window.innerWidth / 2) - 20, wID);
+	// TOOD: _wID will be used in future for modal messageBox
+	var wID = 'iAlert' + new Date().getTime().toString(36) + parseInt(Math.random() * 72).toString(36);
+	iWin.create({title: params.title, onClose:iWin.destroy, type:'message'}, wID);
+	iWin.setContent(msg, wID);
+	iWin.setContentDimensions(null, wID);
+	iWin.setPosition({top:'center', left:'center'}, wID);
 	iWin.show(wID);
 	iWin.toFront(wID);
-	iWin.show(wID);
 	if (typeof params.timeout != 'undefined')
-	setTimeout(function(){iWin.destroy(wID)}, parseInt(params.timeout, 10));
-	return true;
+		setTimeout(function(e){iWin.destroy(wID, e);}, parseInt(params.timeout, 10));
+	return wID;
 }
 
 iWin.selectBoxCallback = {function:null, arg:null};
