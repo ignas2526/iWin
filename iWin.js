@@ -66,9 +66,10 @@ iWin.create = function(param, wID)
 	/*"<img src=\"/img/refresh.png\" onclick=\"bref('"+id+"')\" /> "+*/
 	document.body.appendChild(iWin.win[wID].obj);
 	
-	iWin.win[wID].onshow = typeof param.onshow == 'function' ? param.onshow : function(){};
-	iWin.win[wID].onhide = typeof param.onhide == 'function' ? param.onhide : function(){};
-	iWin.win[wID].onclose = typeof param.onclose == 'function' ? param.onclose : function(){};
+	iWin.win[wID].onShow = typeof param.onShow == 'function' ? param.onShow : function(){};
+	iWin.win[wID].onHide = typeof param.onHide == 'function' ? param.onHide : function(){};
+	iWin.win[wID].onClose = typeof param.onClose == 'function' ? param.onClose : function(){};
+	iWin.win[wID].onDestroy = typeof param.onDestroy == 'function' ? param.onDestroy : function(){};
 	
 	// Capture phase first
 	iWin.addEvent(iWin.win[wID].obj, 'press', function(){iWin.toFront(wID);}, true);
@@ -190,7 +191,7 @@ iWin.show = function(wID)
 iWin.hide = function(wID)
 {
 	if (iWin.win[wID].obj.style.display == 'none') return false;
-	iWin.win[wID].onhide(wID);
+	iWin.win[wID].onHide(wID);
 	iWin.win[wID].obj.style.display = 'none';
 	iWin.zRemove(wID);
 	return true;
