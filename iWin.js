@@ -69,7 +69,6 @@ iWin.create = function(param, wID)
 	iWin.win[wID].onshow = typeof param.onshow == 'function' ? param.onshow : function(){};
 	iWin.win[wID].onhide = typeof param.onhide == 'function' ? param.onhide : function(){};
 	iWin.win[wID].onclose = typeof param.onclose == 'function' ? param.onclose : function(){};
-	iWin.win[wID].onrefresh = typeof param.onrefresh == 'function' ? param.onrefresh : function(){};
 	
 	// Capture phase first
 	iWin.addEvent(iWin.win[wID].obj, 'press', function(){iWin.toFront(wID);}, true);
@@ -194,12 +193,6 @@ iWin.hide = function(wID)
 	iWin.win[wID].onhide(wID);
 	iWin.win[wID].obj.style.display = 'none';
 	iWin.zRemove(wID);
-	return true;
-}
-
-iWin.refresh = function(wID)
-{
-	iWin.win[wID].onrefresh(wID);
 	return true;
 }
 
