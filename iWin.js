@@ -182,9 +182,9 @@ iWin.destroy = function(wID, e)
 iWin.show = function(wID)
 {
 	if (iWin.win[wID].obj.style.display == 'block') return false;
+	iWin.win[wID].onShow(wID);
 	iWin.win[wID].obj.style.display = 'block';
 	iWin.zAdd(wID);
-	iWin.win[wID].onshow(wID);
 	return true;
 }
 
