@@ -168,12 +168,14 @@ iWin.removeEvent = function(object, event, callback, bubbles, passive)
 iWin.destroy = function(wID, e)
 {
 	if (typeof iWin.win[wID] == 'undefined') return false;
+	iWin.win[wID].onDestroy(wID);
+
 	var evt = e || window.event;
 	
 	iWin.zRemove(wID);
 	document.body.removeChild(iWin.win[wID].obj);
 	delete iWin.win[wID];
-	if (typeof evt != 'undefined') evt.stopPropagation();
+	if (evt) (evt.stopPropagation)? evt.stopPropagation(): evt.cancelBubble = true;
 	return true;
 }
 
