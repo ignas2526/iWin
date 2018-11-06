@@ -62,12 +62,15 @@ iWin.init = function(param)
 iWin.create = function(param, wID)
 {
 	if (typeof iWin.win[wID] != 'undefined') return false;
+	if (typeof param.type != 'string') param.type = 'window';
+	if (typeof param.class == 'string') param.class = ' ' + param.class; else param.class = '';
 	
 	iWin.win[wID] = {};
+	iWin.win[wID].type = param.type;
 	iWin.win[wID].tabs = {};
 	iWin.win[wID].wID = wID;
 	iWin.win[wID].obj = document.createElement('div');
-	iWin.win[wID].obj.className = "winb";
+	iWin.win[wID].obj.className = 'winb iwin_'+ param.type + param.class;
 	iWin.win[wID].obj.style.cssText = "display:none;top:50px;left:20px;";
 	iWin.win[wID].obj.innerHTML =
 		'<div class="winbt" style="white-space:nowrap;overflow:hidden;"> </div>'+
