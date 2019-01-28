@@ -402,32 +402,50 @@ function iWindow()
 
 	self.zAdd = function(wID)
 	{
+		// Already added
+		if (self.zwin.indexOf(wID) != -1) return false;
+
 		self.zindex++;
 		self.win[wID].obj.style.zIndex = self.zindex;
-		self.zwin[self.zindex] = self.win[wID].obj;
+		self.zwin[self.zindex] = wID;
+
 		return true;
 	};
 
 	self.zRemove = function(wID)
 	{
-		var zID = parseInt(self.win[wID].obj.style.zIndex, 10);
-		for (var i = zID + 1; i < self.zindex + 1; i++) {self.zwin[i - 1] = self.zwin[i]; self.zwin[i].style.zIndex = i - 1;}
+		var zID = self.zwin.indexOf(wID);
+
+		// Already removed
+		if (zID == -1) return false;
+
+		for (var i = zID + 1, end = self.zindex + 1; i < end; i++) {
+			var wID2 = self.zwin[i];
+			self.zwin[i - 1] = wID2;
+			self.win[wID2].obj.style.zIndex = i - 1;
+		}
+
 		delete self.zwin[self.zindex];
 		self.zindex--;
+
 		return true;
 	};
 
 	self.toFront = function(wID)
 	{
-		var zID = parseInt(self.win[wID].obj.style.zIndex, 10);
+		var zID = self.zwin.indexOf(wID);
+		if (zID == -1) return false;
+
 		if (zID != self.zindex) {
-			for (var i = zID + 1; i < self.zindex + 1; i++) {
-				self.zwin[i - 1] = self.zwin[i];
-				self.zwin[i].style.zIndex = i - 1;
+			for (var i = zID + 1, end = self.zindex + 1; i < end; i++) {
+				var wID2 = self.zwin[i];
+				self.zwin[i - 1] = wID2;
+				self.win[wID2].obj.style.zIndex = i - 1;
 			}
-			self.zwin[self.zindex] = self.win[wID].obj;
+			self.zwin[self.zindex] = wID;
 			self.win[wID].obj.style.zIndex = self.zindex;
 		}
+
 		return true;
 	};
 
