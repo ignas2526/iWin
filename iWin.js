@@ -464,24 +464,11 @@ function iWindow()
 		return true;
 	};
 
-	self.drag = function(wID, e)
-	{
-		if (self.dragObj != -1) self.MoveStop(); // prevent multiple drags
-		self.dragwID = wID;
-		self.dragObj = self.win[wID].obj;
-		
-		self.dragMouseX = e.clientX; self.dragMouseY = e.clientY;
-		self.dragSTop = self.dragObj.offsetTop; self.dragSLeft = self.dragObj.offsetLeft;
-
-		document.body.classList.add('nse');
-		self.addEvent(document, 'move', self.dragM, true);
-		self.addEvent(document, 'end', self.MoveStop, true);
-		return true;
-	};
-
 	self.resize = function(wID, e)
 	{
 		var evt = e || window.event;
+		evt.preventDefault();
+		
 		if (self.dragObj != -1) self.MoveStop(); // there can be only one resize
 		self.dragwID = wID;
 		self.dragObj = self.win[wID].obj;
