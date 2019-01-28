@@ -350,12 +350,27 @@ function iWindow()
 		return true;
 	};
 
-	self.setPosition = function(top, left, wID)
+	self.setPosition = function(params, wID)
 	{
-		self.win[wID].obj.style.top = parseInt(top, 10) + 'px';
-		self.win[wID].obj.style.left = parseInt(left, 10) + 'px';
-		return true;
+		var offsetTop = params.confined ? self.offsetTop : 0;
+		var offsetLeft = params.confined ? self.offsetLeft : 0;
+		var top, left;
+
+		if (typeof params.top != 'undefined' && typeof params.left != 'undefined') {
+			top = parseInt(params.top, 10);
+			if (top < offsetTop) top = offsetTop;
+			
+			left = parseInt(params.left, 10);
+			if (left < offsetLeft) left = offsetLeft;
+			
+		} else {
+			return false;
+		}
+
+		self.win[wID].obj.style.top = top + 'px';
+		self.win[wID].obj.style.left = left + 'px';
 	};
+
 
 	self.showTab = function(tID, wID)
 	{
