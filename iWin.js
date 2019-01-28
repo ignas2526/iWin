@@ -313,7 +313,10 @@ function iWindow()
 			}
 		}
 		
-		self.setContentScroll(self.win[wID].contentScrollHorizontal, self.win[wID].contentScrollVertical, wID);
+		self.setWindowOption({
+			contentScrollHorizontal: self.win[wID].contentScrollHorizontal,
+			contentScrollVertical: self.win[wID].contentScrollVertical
+		}, wID);
 		
 		self.win[wID].obj.style.top = posTop + 'px';
 		self.win[wID].obj.style.left = posLeft + 'px';
@@ -571,6 +574,37 @@ function iWindow()
 		self.win[self.dragwID].onResize(self.dragwID);
 	};
 
+	self.setWindowOption = function(options, wID)
+	{
+		if (typeof self.win[wID] == 'undefined' || typeof options != 'object') return false;
+
+		for (var name in options) {
+			var val = options[name];
+
+			switch (name) {
+				case 'contentScrollHorizontal':
+					self.win[wID].contentScrollHorizontal = val ? true : false;
+					if (self.win[wID].contentScrollHorizontal) {
+						self.win[wID].obj.children[2].style.overflowX = 'scroll';
+					} else {
+						self.win[wID].obj.children[2].style.overflowX = 'hidden';
+					}
+					break;
+
+				case 'contentScrollVertical':
+					self.win[wID].contentcontentScrollVertical = val ? true : false;
+					if (self.win[wID].contentcontentScrollVertical) {
+						self.win[wID].obj.children[2].style.overflowY = 'scroll';
+					} else {
+						self.win[wID].obj.children[2].style.overflowY = 'hidden';
+					}
+					break;
+			}
+		}
+
+		return true;
+	};
+	
 	self.messageBox = function(msg, params, _wID)
 	{
 		// TOOD: _wID will be used in future for modal messageBox
