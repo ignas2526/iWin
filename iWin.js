@@ -303,11 +303,13 @@ function iWindow()
 		self.win[wID].obj.children[2].style.height = self.win[wID].contentHeight + 'px';
 
 		// Set tabs back
-		for (var tID in self.win[wID].tabs) {
-			if (tID == visibleTab ) {
-				self.win[wID].tabs[tID].contentObj.style.display = 'block';
-			} else {
-				self.win[wID].tabs[tID].contentObj.style.display = 'none';
+		if (visibleTab) {
+			for (var tID in self.win[wID].tabs) {
+				if (tID == visibleTab) {
+					self.win[wID].tabs[tID].contentObj.style.display = 'block';
+				} else {
+					self.win[wID].tabs[tID].contentObj.style.display = 'none';
+				}
 			}
 		}
 		
