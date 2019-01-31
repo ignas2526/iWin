@@ -3,12 +3,40 @@
 		<title>iWin JS Library Demo</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<style type="text/css">
-			.winb{overflow:hidden;position:fixed;border:1px solid #000;border-radius:2px;background:#FFF;}
-			.winbt{display:block;border:solid #000;border-width:0px 0px 1px 0px;font-size:15px;cursor:move}
-			.winbt>img{margin:0px 1px -2px 1px;cursor:pointer}
-			.winbb{display:block;border:solid #000;border-width:0px 0px 1px 0px;font-size:15px;}
-			.winbbt{display:inline-block;padding:1px 2px;border:solid #000;border-width: 0px 1px 0px 0px;cursor:pointer}
-			.winbc{display:block;white-space:nowrap;padding:5px}
+			.winb {
+				overflow: visible;
+				position: fixed;
+				border: 1px solid #000;
+				border-radius: 3px;
+				background: #FFF;
+				color: #222;
+			}
+			.winbt {
+				display: block;
+				border: solid #000;
+				border-width: 0px 0px 1px 0px;
+				font-size: 15px;
+				cursor: move;
+				padding: 0 5px;
+				line-height: 21px;
+			}
+			.winbt span:first-child {color: #E00; float: left; cursor:default}
+			.winbb {display:table;width:100%; border:solid #000; border-width:0px 0px 1px 0px; font-size:15px; text-align: center;}
+			.winbbt {display:table-cell;padding:0 2px; line-height:19px; white-space:nowrap; border:solid #000; border-width: 0px 1px 0px 0px; cursor:pointer}
+			.winbbt:last-child {border: none;}
+			.winbbt.open {background:#E6ECF2}
+			.winbc {display:block; white-space:nowrap; position:relative;}
+
+			.winr {position:absolute;}
+			.winr.tl{cursor:nwse-resize;width:14px;height:14px;left:-7px;top:-7px;}
+			.winr.tt{cursor:ns-resize;width:-webkit-calc(100% - 14px);width:calc(100% - 14px);height:10px;left:7px;top:-7px;}
+			.winr.tr{cursor:nesw-resize;width:14px;height:14px;right:-7px;top:-7px;}
+			.winr.bl{cursor:nesw-resize;width:14px;height:14px;left:-7px;bottom:-7px;}
+			.winr.bb{cursor:ns-resize;width:-webkit-calc(100% - 14px);width:calc(100% - 14px);height:10px;left:7px;bottom:-7px;}
+			.winr.br{cursor:nwse-resize;width:14px;height:14px;right:-7px;bottom:-7px;}
+			.winr.ll{cursor:ew-resize;height:-webkit-calc(100% - 14px);height:calc(100% - 14px);width:10px;left:-7px;top:7px}
+			.winr.rr{cursor:ew-resize;height:-webkit-calc(100% - 14px);height:calc(100% - 14px);width:10px;right:-7px;top:7px}
+			
 			/* .nse is set to body on drag and resize */
 			.nse{-moz-user-select:-moz-none;-moz-user-select:none;-o-user-select:none;-khtml-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none}
 		</style>
