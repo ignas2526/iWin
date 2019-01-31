@@ -43,10 +43,20 @@
 		<script type="text/javascript" src="iWin.js"></script>
 		<script type="text/javascript">
 			window.addEventListener('load', function(e) {
-				iWin.init({onSetTitle:function(wID, obj, title) {
-					obj.innerHTML = '<span>[X]</span><span>'+ title+ '</span>';
-					iWin.win[wID].obj.addEventListener('mousedown', function(e) {iWin.win[wID].onclose(wID, e);e.stopPropagation();}, true);
-				}});
+				iWin.init({
+					onSetTitle:function(wID, obj, title)
+					{
+						obj.innerHTML = '<span>[X]</span><span>'+ title+ '</span>';
+
+						// Capture phase second
+						iWin.addEvent(iWin.win[wID].obj.children[0].children[0], 'press', function(e) {
+							var evt = e || window.event;
+							evt.preventDefault();
+							iWin.win[wID].onClose(wID, e);
+							(e.stopPropagation)? e.stopPropagation(): e.cancelBubble = true;
+						}, true);
+					}
+					});
 			});
 					
 			function createDemoWindow()
@@ -59,7 +69,7 @@
 						They can be changed later by calling various methods.
 						Second Argument is window id (wId). It should be unique.
 					*/
-					iWin.create({title: 'Window Title', onclose:function(){iWin.destroy(wID)}}, wID);
+					iWin.create({title: 'Window Title', onClose:function(){iWin.destroy(wID)}}, wID);
 
 					/*
 						Set contents of the window.
@@ -73,7 +83,8 @@
 						'nec tincidunt auctor, risus dui congue felis, vel tristique ipsum sapien sed lorem.<br>'+
 						'Maecenas tempor vestibulum nunc vel maximus. Nulla varius finibus velit, in aliquet<br>'+
 						'felis dignissim in. Pellentesque ut commodo metus. Sed suscipit erat non mauris finibus<br>'+
-						'pretium. Phasellus dignissim sem turpis, id suscipit magna suscipit ut. ', true, wID);
+						'pretium. Phasellus dignissim sem turpis, id suscipit magna suscipit ut. ', wID);
+					iWin.setContentDimensions(null, wID);
 					iWin.setPosition(60, (window.innerWidth / 2) - 20, wID);
 
 					// Show the Window
