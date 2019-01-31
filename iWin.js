@@ -467,6 +467,7 @@ function iWindow()
 	// moveT, moveB, moveL, moveR, invertB, invertR
 	//r_t, r_r, r_b, r_l, m_b, m_l
 	self.resize = function(wID, params, e)
+	{
 		var evt = e || window.event;
 		evt.preventDefault();
 		
